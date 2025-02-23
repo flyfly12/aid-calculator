@@ -6,27 +6,40 @@
     <title>Princeton Financial Aid Calculator</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; }
-        label { display: inline-block; width: 300px; }
-        input { padding: 5px; width: 150px; }
+        label { display: inline-block; width: 350px; }
+        input { padding: 5px; width: 200px; }
         button { padding: 10px 20px; margin-top: 10px; }
         h1, h2 { color: #333; }
         p { margin: 5px 0; }
+        .note { font-size: 0.9em; color: #666; }
     </style>
 </head>
 <body>
+    <p class="note">
+        This calculator estimates financial aid eligibility based on family income, assets, and number of undergraduate siblings in college. 
+        The total cost of attendance is prepopulated with Princeton University's estimated cost for the 2024-25 academic year ($86,700). 
+        You can adjust this value for other institutions.
+    </p>
     <h1>Princeton Financial Aid Calculator</h1>
     <form id="aidForm">
+        <label for="costOfAttendance">Total Cost of Attendance ($):</label>
+        <input type="text" id="costOfAttendance" name="costOfAttendance" value="86,700" required><br><br>
+        
         <label for="income">Family Income ($):</label>
-        <input type="number" id="income" name="income" min="0" required><br><br>
+        <input type="text" id="income" name="income" required><br><br>
         
         <label for="assets">Family Assets ($):</label>
-        <input type="number" id="assets" name="assets" min="0" required><br><br>
+        <input type="text" id="assets" name="assets" required><br><br>
         
         <label for="siblings">Number of Undergraduate Siblings in College (including the student):</label>
         <input type="number" id="siblings" name="siblings" min="1" required><br><br>
         
         <button type="button" onclick="calculateAid()">Calculate</button>
     </form>
+    
+    <p class="note">
+        Note: This calculator provides an estimate based on simplified assumptions. Actual financial aid may differ due to additional factors considered by Princeton University.
+    </p>
     
     <h2>Results</h2>
     <p id="totalContribution"></p>
@@ -35,31 +48,67 @@
     <p id="eligibility"></p>
     
     <script>
+        // Function to format numbers with commas and two decimal places
+        function formatNumber(number) {
+            return number.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+        
+        // Function to format input fields with commas as user types
+        function formatInput(field) {
+            field.addEventListener('input', function() {
+                let value = this.value.replace(/[^0-9]/g, '');
+                this.value = value ? parseFloat(value).toLocaleString('en-US') : '';
+            });
+        }
+        
+        // Apply formatting to input fields
+        formatInput(document.getElementById('costOfAttendance'));
+        formatInput(document.getElementById('income'));
+        formatInput(document.getElementById('assets'));
+        
         function calculateAid() {
-            // Get input values
-            const income = parseFloat(document.getElementById('income').value);
-            const assets = parseFloat(document.getElementById('assets').value);
-            const siblings = parseInt(document.getElementById('siblings').value);
+            // Get input values and remove commas
+            const costOfAttendanceStr = document.getElementById('costOfAttendance').value.replace(/,/g, '');
+            const incomeStr = document.getElementById('income').value.replace(/,/g, '');
+            const assetsStr = document.getElementById('assets').value.replace(/,/g, '');
+            const siblingsStr = document.getElementById('siblings').value;
+            
+            // Validate inputs
+            if (!costOfAttendanceStr || !incomeStr || !assetsStr || !siblingsStr ||
+                isNaN(parseFloat(costOfAttendanceStr)) || isNaN(parseFloat(incomeStr)) ||
+                isNaN(parseFloat(assetsStr)) || isNaN(parseInt(siblingsStr))) {
+                alert('Please enter valid numbers in all fields.');
+                return;
+            }
+            
+            const costOfAttendance = parseFloat(costOfAttendanceStr);
+            const income = parseFloat(incomeStr);
+            const assets = parseFloat(assetsStr);
+            const siblings = parseInt(siblingsStr);
+            
+            if (siblings < 1) {
+                alert('Number of siblings must be at least 1.');
+                return;
+            }
             
             // Calculate contributions
             const incomeContribution = Math.max(0, 0.25 * (income - 100000));
             const assetContribution = Math.max(0, 0.05 * (assets - 150000));
             const totalFamilyContribution = incomeContribution + assetContribution;
             const perChildContribution = totalFamilyContribution / siblings;
-            const costOfAttendance = 86700;
             const financialNeed = costOfAttendance - perChildContribution;
             
-            // Display results
+            // Display results with formatted numbers
             document.getElementById('totalContribution').innerText = 
-                `Total Family Contribution: $${totalFamilyContribution.toFixed(2)}`;
+                `Total Family Contribution: $${formatNumber(totalFamilyContribution)}`;
             document.getElementById('perChildContribution').innerText = 
-                `Per-Child Contribution: $${perChildContribution.toFixed(2)}`;
+                `Per-Child Contribution: $${formatNumber(perChildContribution)}`;
             document.getElementById('financialNeed').innerText = 
-                `Financial Need: $${financialNeed.toFixed(2)}`;
+                `Financial Need: $${formatNumber(financialNeed)}`;
             
             if (financialNeed > 0) {
                 document.getElementById('eligibility').innerText = 
-                    `Eligible for Aid: Yes, approximately $${financialNeed.toFixed(2)}`;
+                    `Eligible for Aid: Yes, approximately $${formatNumber(financialNeed)}`;
             } else {
                 document.getElementById('eligibility').innerText = 
                     'Eligible for Aid: No';
