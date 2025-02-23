@@ -5,178 +5,193 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Princeton Financial Aid Calculator</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cleave.js/1.6.0/cleave.min.js"></script>
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --primary-color: #1976D2; /* Blue shade for buttons and accents */
-            --accent-color: #64B5F6; /* Lighter blue for secondary elements */
-            --background-color: #FFFFFF; /* White for cards */
-            --text-color: #212121; /* Dark gray for text */
-            --shadow-color: rgba(0, 0, 0, 0.1); /* Subtle shadow */
-        }
         body {
-            font-family: 'Roboto', sans-serif;
-            margin: 20px;
-            background-color: #f5f5f5; /* Light gray background */
-            color: var(--text-color);
+            font-family: 'Roboto', sans-serif; /* Modern font */
+            margin: 0; /* Reset default margin */
+            padding: 20px;
+            background-color: #f8f9fa; /* Light background color */
+            color: #343a40; /* Darker text color */
+            line-height: 1.6;
         }
+
         .container {
-            max-width: 800px;
-            margin: 0 auto;
+            max-width: 800px; /* Limit page width for better readability */
+            margin: 20px auto; /* Center container */
+            background-color: #fff; /* White container background */
+            padding: 30px;
+            border-radius: 10px; /* Rounded corners for container */
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
         }
+
         h1 {
-            font-weight: 700;
-            font-size: 2rem;
+            color: #007bff; /* Princeton Blue - or a modern blue */
             text-align: center;
             margin-bottom: 20px;
         }
-        .card {
-            background-color: var(--background-color);
-            padding: 20px;
-            margin-bottom: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px var(--shadow-color);
-        }
+
         h2 {
-            font-weight: 700;
-            font-size: 1.5rem;
+            color: #495057;
+            margin-top: 30px;
+            border-bottom: 1px solid #eee; /* Light border for headings */
+            padding-bottom: 5px;
+        }
+
+        p {
+            margin-bottom: 15px;
+        }
+
+        .note {
+            font-size: 0.9em;
+            color: #6c757d; /* Muted note color */
+            background-color: #f0f0f0; /* Light grey background for notes */
+            padding: 10px 15px;
+            border-radius: 5px;
             margin-bottom: 20px;
         }
+
         .field-group {
             margin-bottom: 20px;
         }
+
         label {
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            margin-bottom: 5px;
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500; /* Slightly bolder label */
         }
-        .material-icons {
-            margin-right: 8px;
-            color: var(--primary-color);
-        }
-        input[type="text"], input[type="number"] {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
+
+        input[type="text"],
+        input[type="number"] {
+            padding: 12px; /* Increased padding */
+            width: calc(100% - 24px); /* Full width input */
+            border: 1px solid #ced4da; /* Light grey border */
+            border-radius: 8px; /* Rounded input corners */
+            margin-bottom: 8px;
             font-size: 1rem;
-            box-sizing: border-box;
+            transition: border-color 0.2s ease-in-out;
         }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus {
+            border-color: #007bff; /* Blue border on focus */
+            outline: none;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25); /* Subtle focus shadow */
+        }
+
         input[type="range"] {
-            width: 100%;
-            -webkit-appearance: none;
-            appearance: none;
-            height: 8px;
-            background: #ddd;
-            border-radius: 5px;
+            width: 100%; /* Full width slider */
             margin-top: 10px;
         }
-        input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 20px;
-            height: 20px;
-            background: var(--primary-color);
-            border-radius: 50%;
-            cursor: pointer;
-        }
-        input[type="range"]::-moz-range-thumb {
-            width: 20px;
-            height: 20px;
-            background: var(--primary-color);
-            border-radius: 50%;
-            cursor: pointer;
-            border: none;
-        }
+
         button {
-            background-color: var(--primary-color);
+            padding: 12px 25px;
+            background-color: #007bff; /* Blue button */
             color: white;
             border: none;
-            padding: 12px 24px;
-            border-radius: 4px;
-            font-size: 1rem;
+            border-radius: 8px; /* Rounded button corners */
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            transition: background-color 0.3s;
-        }
-        button:hover {
-            background-color: #1565C0; /* Darker shade on hover */
-        }
-        .note {
-            font-size: 0.9rem;
-            color: #666;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        #results p {
             font-size: 1rem;
-            margin-bottom: 10px;
+            transition: background-color 0.3s ease;
+            margin-top: 15px;
         }
-        .eligible { color: green; }
-        .not-eligible { color: red; }
-        @media (max-width: 600px) {
-            .card {
-                padding: 15px;
+
+        button:hover {
+            background-color: #0056b3; /* Darker blue on hover */
+        }
+
+        button[type="reset"] { /* Style for reset button */
+            background-color: #dc3545; /* Red reset button */
+        }
+
+        button[type="reset"]:hover {
+            background-color: #c82333; /* Darker red on hover */
+        }
+
+
+        /* Color-coded results */
+        .eligible {
+            color: #28a745; /* Green for eligible */
+            font-weight: bold;
+        }
+
+        .not-eligible {
+            color: #dc3545; /* Red for not eligible */
+            font-weight: bold;
+        }
+
+        #errorArea {
+            color: #dc3545;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+                margin: 10px;
             }
-            button {
-                width: 100%;
-                justify-content: center;
+            input[type="text"],
+            input[type="number"],
+            input[type="range"] {
+                width: calc(100% - 24px); /* Ensure full width on smaller screens */
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Princeton Financial Aid Calculator</h1>
+        <h1>Financial Aid Calculator</h1>
+        <form id="aidForm">
+            <div id="errorArea"></div> <div class="field-group">
+                <label for="costOfAttendance">Total Cost of Attendance ($):</label>
+                <input type="text" id="costOfAttendance" required>
+            </div>
+
+            <div class="field-group">
+                <label for="income">Family Income ($):</label>
+                <input type="text" id="income" required>
+                <input type="range" id="incomeSlider" min="0" max="1000000" step="10000">
+            </div>
+
+            <div class="field-group">
+                <label for="assets">Family Assets ($):</label>
+                <input type="text" id="assets" required>
+                <input type="range" id="assetsSlider" min="0" max="4000000" step="10000">
+            </div>
+
+            <div class="field-group">
+                <label for="siblings">Number of Undergraduate Siblings in College (including the student):</label>
+                <input type="number" id="siblings" min="1" value="1" required>
+            </div>
+
+            <button type="button" onclick="calculateAid()">Calculate</button>
+
+        <h2>Results</h2>
+        <p id="totalContribution"></p>
+        <p id="perChildContribution"></p>
+        <p id="financialNeed"></p>
+        <p id="eligibility"></p>
+        <button type="button" onclick="shareResults()">Share Results</button>
         <p class="note">
-            Estimate your financial aid eligibility based on family income, assets, and siblings in college. 
-            Default cost of attendance is set to Princeton’s 2024-25 estimate ($86,700).
+            Note: This calculator provides an estimate based on simplified assumptions. Actual financial aid may differ due to additional factors considered by University.
+            <br><br>
+            <b>Simplified Calculation Formula:</b> Family Contribution = (25% of (Income - $100,000) + 5% of (Assets - $150,000)) / (Number of Siblings).  Financial Need = Total Cost of Attendance - Per-Child Contribution.
         </p>
-        <div class="card">
-            <h2>Input Parameters</h2>
-            <form id="aidForm">
-                <div class="field-group">
-                    <label for="costOfAttendance"><i class="material-icons">attach_money</i> Total Cost of Attendance ($):</label>
-                    <input type="text" id="costOfAttendance" required>
-                </div>
-                <div class="field-group">
-                    <label for="income"><i class="material-icons">attach_money</i> Family Income ($):</label>
-                    <input type="text" id="income" required>
-                    <input type="range" id="incomeSlider" min="0" max="1000000" step="10000">
-                </div>
-                <div class="field-group">
-                    <label for="assets"><i class="material-icons">attach_money</i> Family Assets ($):</label>
-                    <input type="text" id="assets" required>
-                    <input type="range" id="assetsSlider" min="0" max="4000000" step="10000">
-                </div>
-                <div class="field-group">
-                    <label for="siblings"><i class="material-icons">group</i> Number of Undergraduate Siblings in College:</label>
-                    <input type="number" id="siblings" min="1" value="1" required>
-                </div>
-                <button type="button" onclick="calculateAid()"><i class="material-icons">calculate</i> Calculate</button>
-            </form>
-        </div>
-        <div class="card" id="results">
-            <h2>Results</h2>
-            <p id="totalContribution"></p>
-            <p id="perChildContribution"></p>
-            <p id="financialNeed"></p>
-            <p id="eligibility"></p>
-            <button type="button" onclick="shareResults()"><i class="material-icons">share</i> Share Results</button>
-        </div>
+
     </div>
 
     <script>
-        // Initialize Cleave.js for formatted inputs
+        // Initialize cleave.js for formatted inputs
         const costOfAttendanceCleave = new Cleave('#costOfAttendance', {
             numeral: true,
             numeralThousandsGroupStyle: 'thousand',
             numeralDecimalScale: 0
         });
-        costOfAttendanceCleave.setRawValue('86700'); // Default Princeton cost
+        costOfAttendanceCleave.setRawValue('90000');  // Default cost of attendance
 
         const incomeCleave = new Cleave('#income', {
             numeral: true,
@@ -184,7 +199,8 @@
             numeralDecimalScale: 0,
             onValueChanged: function(e) {
                 const value = parseFloat(e.target.rawValue) || 0;
-                document.getElementById('incomeSlider').value = Math.round(value / 10000) * 10000;
+                const nearestStep = Math.round(value / 10000) * 10000;
+                document.getElementById('incomeSlider').value = nearestStep;
             }
         });
         incomeCleave.setRawValue('400000');  // Pre-populate income with 400,000
@@ -195,7 +211,8 @@
             numeralDecimalScale: 0,
             onValueChanged: function(e) {
                 const value = parseFloat(e.target.rawValue) || 0;
-                document.getElementById('assetsSlider').value = Math.round(value / 10000) * 10000;
+                const nearestStep = Math.round(value / 10000) * 10000;
+                document.getElementById('assetsSlider').value = nearestStep;
             }
         });
         assetsCleave.setRawValue('750000');  // Pre-populate assets with 750,000
@@ -204,29 +221,32 @@
         document.getElementById('incomeSlider').value = 400000;
         document.getElementById('assetsSlider').value = 750000;
 
-        // Sync sliders with inputs
+        // Sync sliders with text inputs
         document.getElementById('incomeSlider').addEventListener('input', function() {
             incomeCleave.setRawValue(this.value);
         });
+
         document.getElementById('assetsSlider').addEventListener('input', function() {
             assetsCleave.setRawValue(this.value);
         });
 
-        // Format numbers with commas
+        // Format numbers with commas and two decimal places
         function formatNumber(number) {
             return number.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         }
 
-        // Calculate financial aid
+        // Calculate financial aid with color-coded results and input validation
         function calculateAid() {
             const costOfAttendance = parseFloat(costOfAttendanceCleave.getRawValue());
             const income = parseFloat(incomeCleave.getRawValue());
             const assets = parseFloat(assetsCleave.getRawValue());
             const siblings = parseInt(document.getElementById('siblings').value);
 
-            if (isNaN(costOfAttendance) || isNaN(income) || isNaN(assets) || isNaN(siblings) || siblings < 1) {
-                alert('Please enter valid numbers. Siblings must be at least 1.');
-                return;
+            if (isNaN(costOfAttendance) || costOfAttendance < 0 || isNaN(income) || income < 0 || isNaN(assets) || assets < 0 || isNaN(siblings) || siblings < 1 || !Number.isInteger(siblings)) {
+                document.getElementById('errorArea').innerText = 'Please enter valid non-negative numbers for Cost, Income, and Assets, and a valid integer for Siblings (at least 1).';
+                return; // Stop calculation
+            } else {
+                document.getElementById('errorArea').innerText = ''; // Clear any previous error
             }
 
             const incomeContribution = Math.max(0, 0.25 * (income - 100000));
@@ -235,48 +255,66 @@
             const perChildContribution = totalFamilyContribution / siblings;
             const financialNeed = costOfAttendance - perChildContribution;
 
-            document.getElementById('totalContribution').textContent = 
+            document.getElementById('totalContribution').innerText =
                 `Total Family Contribution: $${formatNumber(totalFamilyContribution)}`;
-            document.getElementById('perChildContribution').textContent = 
+            document.getElementById('perChildContribution').innerText =
                 `Per-Child Contribution: $${formatNumber(perChildContribution)}`;
-            document.getElementById('financialNeed').textContent = 
+            document.getElementById('financialNeed').innerText =
                 `Financial Need: $${formatNumber(financialNeed)}`;
 
             const eligibilityElement = document.getElementById('eligibility');
             if (financialNeed > 0) {
-                eligibilityElement.textContent = `Eligible for Aid: Yes, approximately $${formatNumber(financialNeed)}`;
-                eligibilityElement.className = 'eligible';
+                eligibilityElement.innerText = `Eligible for Aid: Yes, approximately $${formatNumber(financialNeed)}`;
+                eligibilityElement.className = 'eligible';  // Green text
             } else {
-                eligibilityElement.textContent = 'Eligible for Aid: No';
-                eligibilityElement.className = 'not-eligible';
+                eligibilityElement.innerText = 'Eligible for Aid: No';
+                eligibilityElement.className = 'not-eligible';  // Red text
             }
         }
 
-        // Share results via URL
+        // Share results by generating a URL with query parameters and copy to clipboard
         function shareResults() {
-            const params = new URLSearchParams({
-                cost: costOfAttendanceCleave.getRawValue(),
-                income: incomeCleave.getRawValue(),
-                assets: assetsCleave.getRawValue(),
-                siblings: document.getElementById('siblings').value
-            });
-            const url = `${window.location.origin}${window.location.pathname}?${params.toString()}`;
-            prompt('Copy this link to share your results:', url);
+            const costOfAttendance = costOfAttendanceCleave.getRawValue();
+            const income = incomeCleave.getRawValue();
+            const assets = assetsCleave.getRawValue();
+            const siblings = document.getElementById('siblings').value;
+
+            const url = new URL(window.location.href);
+            url.searchParams.set('cost', costOfAttendance);
+            url.searchParams.set('income', income);
+            url.searchParams.set('assets', assets);
+            url.searchParams.set('siblings', siblings);
+
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(url.toString()).then(() => {
+                    alert('Link copied to clipboard!'); // Simple alert for clipboard success
+                }).catch(err => {
+                    console.error('Failed to copy link: ', err);
+                    prompt('Copy this link to share your results:', url.toString()); // Fallback to prompt
+                });
+            } else {
+                prompt('Copy this link to share your results:', url.toString()); // Fallback to prompt for older browsers
+            }
         }
 
-        // Load from URL parameters
+        // Pre-populate fields from query parameters if present
         window.onload = function() {
-            const params = new URLSearchParams(window.location.search);
-            if (params.get('cost')) costOfAttendanceCleave.setRawValue(params.get('cost'));
-            if (params.get('income')) {
-                incomeCleave.setRawValue(params.get('income'));
-                document.getElementById('incomeSlider').value = Math.round(parseFloat(params.get('income')) / 10000) * 10000;
+            const urlParams = new URLSearchParams(window.location.search);
+            const cost = urlParams.get('cost');
+            const income = urlParams.get('income');
+            const assets = urlParams.get('assets');
+            const siblings = urlParams.get('siblings');
+
+            if (cost) costOfAttendanceCleave.setRawValue(cost);
+            if (income) {
+                incomeCleave.setRawValue(income);
+                document.getElementById('incomeSlider').value = Math.round(parseFloat(income) / 10000) * 10000;
             }
-            if (params.get('assets')) {
-                assetsCleave.setRawValue(params.get('assets'));
-                document.getElementById('assetsSlider').value = Math.round(parseFloat(params.get('assets')) / 10000) * 10000;
+            if (assets) {
+                assetsCleave.setRawValue(assets);
+                document.getElementById('assetsSlider').value = Math.round(parseFloat(assets) / 10000) * 10000;
             }
-            if (params.get('siblings')) document.getElementById('siblings').value = params.get('siblings');
+            if (siblings) document.getElementById('siblings').value = siblings;
         };
     </script>
 </body>
