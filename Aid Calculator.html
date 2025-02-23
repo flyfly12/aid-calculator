@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Princeton Financial Aid Calculator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cleave.js/1.6.0/cleave.min.js"></script>
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; }
         label { display: inline-block; width: 350px; }
@@ -23,16 +24,16 @@
     <h1>Princeton Financial Aid Calculator</h1>
     <form id="aidForm">
         <label for="costOfAttendance">Total Cost of Attendance ($):</label>
-        <input type="text" id="costOfAttendance" name="costOfAttendance" value="86,700" required><br><br>
+        <input type="text" id="costOfAttendance" value="86700" required><br><br>
         
         <label for="income">Family Income ($):</label>
-        <input type="text" id="income" name="income" required><br><br>
+        <input type="text" id="income" required><br><br>
         
         <label for="assets">Family Assets ($):</label>
-        <input type="text" id="assets" name="assets" required><br><br>
+        <input type="text" id="assets" required><br><br>
         
         <label for="siblings">Number of Undergraduate Siblings in College (including the student):</label>
-        <input type="number" id="siblings" name="siblings" min="1" required><br><br>
+        <input type="number" id="siblings" min="1" required><br><br>
         
         <button type="button" onclick="calculateAid()">Calculate</button>
     </form>
@@ -48,46 +49,38 @@
     <p id="eligibility"></p>
     
     <script>
+        // Initialize cleave.js for formatted inputs
+        const costOfAttendanceCleave = new Cleave('#costOfAttendance', {
+            numeral: true,
+            numeralThousandsGroupStyle: 'thousand',
+            numeralDecimalScale: 0
+        });
+        const incomeCleave = new Cleave('#income', {
+            numeral: true,
+            numeralThousandsGroupStyle: 'thousand',
+            numeralDecimalScale: 0
+        });
+        const assetsCleave = new Cleave('#assets', {
+            numeral: true,
+            numeralThousandsGroupStyle: 'thousand',
+            numeralDecimalScale: 0
+        });
+        
         // Function to format numbers with commas and two decimal places
         function formatNumber(number) {
             return number.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         }
         
-        // Function to format input fields with commas as user types
-        function formatInput(field) {
-            field.addEventListener('input', function() {
-                let value = this.value.replace(/[^0-9]/g, '');
-                this.value = value ? parseFloat(value).toLocaleString('en-US') : '';
-            });
-        }
-        
-        // Apply formatting to input fields
-        formatInput(document.getElementById('costOfAttendance'));
-        formatInput(document.getElementById('income'));
-        formatInput(document.getElementById('assets'));
-        
         function calculateAid() {
-            // Get input values and remove commas
-            const costOfAttendanceStr = document.getElementById('costOfAttendance').value.replace(/,/g, '');
-            const incomeStr = document.getElementById('income').value.replace(/,/g, '');
-            const assetsStr = document.getElementById('assets').value.replace(/,/g, '');
-            const siblingsStr = document.getElementById('siblings').value;
+            // Get raw values from cleave.js inputs
+            const costOfAttendance = parseFloat(costOfAttendanceCleave.getRawValue());
+            const income = parseFloat(incomeCleave.getRawValue());
+            const assets = parseFloat(assetsCleave.getRawValue());
+            const siblings = parseInt(document.getElementById('siblings').value);
             
             // Validate inputs
-            if (!costOfAttendanceStr || !incomeStr || !assetsStr || !siblingsStr ||
-                isNaN(parseFloat(costOfAttendanceStr)) || isNaN(parseFloat(incomeStr)) ||
-                isNaN(parseFloat(assetsStr)) || isNaN(parseInt(siblingsStr))) {
-                alert('Please enter valid numbers in all fields.');
-                return;
-            }
-            
-            const costOfAttendance = parseFloat(costOfAttendanceStr);
-            const income = parseFloat(incomeStr);
-            const assets = parseFloat(assetsStr);
-            const siblings = parseInt(siblingsStr);
-            
-            if (siblings < 1) {
-                alert('Number of siblings must be at least 1.');
+            if (isNaN(costOfAttendance) || isNaN(income) || isNaN(assets) || isNaN(siblings) || siblings < 1) {
+                alert('Please enter valid numbers in all fields. Number of siblings must be at least 1.');
                 return;
             }
             
