@@ -7,12 +7,19 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cleave.js/1.6.0/cleave.min.js"></script>
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; }
-        label { display: inline-block; width: 350px; }
-        input { padding: 5px; width: 200px; }
+        label { display: block; margin-bottom: 5px; }
+        input[type="text"], input[type="number"] { padding: 5px; width: 200px; }
+        input[type="range"] { width: 300px; margin-top: 5px; }
         button { padding: 10px 20px; margin-top: 10px; }
         h1, h2 { color: #333; }
         p { margin: 5px 0; }
         .note { font-size: 0.9em; color: #666; }
+        .field-group { margin-bottom: 15px; }
+        input:focus { border-color: #007bff; outline: none; }
+        @media (max-width: 600px) {
+            .field-group { display: block; }
+            input[type="range"] { width: 100%; }
+        }       
     </style>
 </head>
 <body>
@@ -23,17 +30,27 @@
     </p>
     <h1>Princeton Financial Aid Calculator</h1>
     <form id="aidForm">
-        <label for="costOfAttendance">Total Cost of Attendance ($):</label>
-        <input type="text" id="costOfAttendance" value="86700" required><br><br>
+        <div class="field-group">
+            <label for="costOfAttendance">Total Cost of Attendance ($):</label>
+            <input type="text" id="costOfAttendance" required>
+        </div>
         
-        <label for="income">Family Income ($):</label>
-        <input type="text" id="income" required><br><br>
+        <div class="field-group">
+            <label for="income">Family Income ($):</label>
+            <input type="text" id="income" required>
+            <input type="range" id="incomeSlider" min="0" max="1000000" step="10000">
+        </div>
         
-        <label for="assets">Family Assets ($):</label>
-        <input type="text" id="assets" required><br><br>
+        <div class="field-group">
+            <label for="assets">Family Assets ($):</label>
+            <input type="text" id="assets" required>
+            <input type="range" id="assetsSlider" min="0" max="4000000" step="10000">
+        </div>
         
-        <label for="siblings">Number of Undergraduate Siblings in College (including the student):</label>
-        <input type="number" id="siblings" min="1" required><br><br>
+        <div class="field-group">
+            <label for="siblings">Number of Undergraduate Siblings in College (including the student):</label>
+            <input type="number" id="siblings" min="1" value = "1" required>
+        </div>
         
         <button type="button" onclick="calculateAid()">Calculate</button>
     </form>
@@ -55,57 +72,76 @@
             numeralThousandsGroupStyle: 'thousand',
             numeralDecimalScale: 0
         });
+        costOfAttendanceCleave.setRawValue('86700');  // Default cost of attendance
+
         const incomeCleave = new Cleave('#income', {
             numeral: true,
             numeralThousandsGroupStyle: 'thousand',
-            numeralDecimalScale: 0
+            numeralDecimalScale: 0,
+            onValueChanged: function(e) {
+                const value = parseFloat(e.target.rawValue) || 0;
+                const nearestStep = Math.round(value / 10000) * 10000;
+                document.getElementById('incomeSlider').value = nearestStep;
+            }
         });
+        incomeCleave.setRawValue('400000');  // Pre-populate income with 400,000
+
         const assetsCleave = new Cleave('#assets', {
             numeral: true,
             numeralThousandsGroupStyle: 'thousand',
-            numeralDecimalScale: 0
+            numeralDecimalScale: 0,
+            onValueChanged: function(e) {
+                const value = parseFloat(e.target.rawValue) || 0;
+                const nearestStep = Math.round(value / 10000) * 10000;
+                document.getElementById('assetsSlider').value = nearestStep;
+            }
+        });
+        assetsCleave.setRawValue('750000');  // Pre-populate assets with 750,000
+
+        // Set initial slider positions to match input values
+        document.getElementById('incomeSlider').value = 400000;
+        document.getElementById('assetsSlider').value = 750000;
+
+        // Sync sliders with text inputs
+        document.getElementById('incomeSlider').addEventListener('input', function() {
+            incomeCleave.setRawValue(this.value);
         });
         
-        // Function to format numbers with commas and two decimal places
+        document.getElementById('assetsSlider').addEventListener('input', function() {
+            assetsCleave.setRawValue(this.value);
+        });
+        
+        // Format numbers with commas and two decimal places
         function formatNumber(number) {
             return number.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         }
         
+        // Calculate financial aid (simplified example)
         function calculateAid() {
-            // Get raw values from cleave.js inputs
             const costOfAttendance = parseFloat(costOfAttendanceCleave.getRawValue());
             const income = parseFloat(incomeCleave.getRawValue());
             const assets = parseFloat(assetsCleave.getRawValue());
             const siblings = parseInt(document.getElementById('siblings').value);
             
-            // Validate inputs
             if (isNaN(costOfAttendance) || isNaN(income) || isNaN(assets) || isNaN(siblings) || siblings < 1) {
                 alert('Please enter valid numbers in all fields. Number of siblings must be at least 1.');
                 return;
             }
             
-            // Calculate contributions
             const incomeContribution = Math.max(0, 0.25 * (income - 100000));
             const assetContribution = Math.max(0, 0.05 * (assets - 150000));
             const totalFamilyContribution = incomeContribution + assetContribution;
             const perChildContribution = totalFamilyContribution / siblings;
             const financialNeed = costOfAttendance - perChildContribution;
             
-            // Display results with formatted numbers
             document.getElementById('totalContribution').innerText = 
                 `Total Family Contribution: $${formatNumber(totalFamilyContribution)}`;
             document.getElementById('perChildContribution').innerText = 
                 `Per-Child Contribution: $${formatNumber(perChildContribution)}`;
             document.getElementById('financialNeed').innerText = 
                 `Financial Need: $${formatNumber(financialNeed)}`;
-            
-            if (financialNeed > 0) {
-                document.getElementById('eligibility').innerText = 
-                    `Eligible for Aid: Yes, approximately $${formatNumber(financialNeed)}`;
-            } else {
-                document.getElementById('eligibility').innerText = 
-                    'Eligible for Aid: No';
-            }
+            document.getElementById('eligibility').innerText = 
+                financialNeed > 0 ? `Eligible for Aid: Yes, approximately $${formatNumber(financialNeed)}` : 'Eligible for Aid: No';
         }
     </script>
 </body>
