@@ -19,7 +19,10 @@
         @media (max-width: 600px) {
             .field-group { display: block; }
             input[type="range"] { width: 100%; }
-        }       
+        }
+        /* Added for color-coded results */
+        .eligible { color: green; }
+        .not-eligible { color: red; }
     </style>
 </head>
 <body>
@@ -49,7 +52,7 @@
         
         <div class="field-group">
             <label for="siblings">Number of Undergraduate Siblings in College (including the student):</label>
-            <input type="number" id="siblings" min="1" value = "1" required>
+            <input type="number" id="siblings" min="1" value="1" required>
         </div>
         
         <button type="button" onclick="calculateAid()">Calculate</button>
@@ -64,6 +67,8 @@
     <p id="perChildContribution"></p>
     <p id="financialNeed"></p>
     <p id="eligibility"></p>
+    <!-- Added Share Results button -->
+    <button type="button" onclick="shareResults()">Share Results</button>
     
     <script>
         // Initialize cleave.js for formatted inputs
@@ -116,7 +121,7 @@
             return number.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         }
         
-        // Calculate financial aid (simplified example)
+        // Calculate financial aid with color-coded results
         function calculateAid() {
             const costOfAttendance = parseFloat(costOfAttendanceCleave.getRawValue());
             const income = parseFloat(incomeCleave.getRawValue());
@@ -140,9 +145,52 @@
                 `Per-Child Contribution: $${formatNumber(perChildContribution)}`;
             document.getElementById('financialNeed').innerText = 
                 `Financial Need: $${formatNumber(financialNeed)}`;
-            document.getElementById('eligibility').innerText = 
-                financialNeed > 0 ? `Eligible for Aid: Yes, approximately $${formatNumber(financialNeed)}` : 'Eligible for Aid: No';
+            
+            const eligibilityElement = document.getElementById('eligibility');
+            if (financialNeed > 0) {
+                eligibilityElement.innerText = `Eligible for Aid: Yes, approximately $${formatNumber(financialNeed)}`;
+                eligibilityElement.className = 'eligible';  // Green text
+            } else {
+                eligibilityElement.innerText = 'Eligible for Aid: No';
+                eligibilityElement.className = 'not-eligible';  // Red text
+            }
         }
+
+        // Share results by generating a URL with query parameters
+        function shareResults() {
+            const costOfAttendance = costOfAttendanceCleave.getRawValue();
+            const income = incomeCleave.getRawValue();
+            const assets = assetsCleave.getRawValue();
+            const siblings = document.getElementById('siblings').value;
+            
+            const url = new URL(window.location.href);
+            url.searchParams.set('cost', costOfAttendance);
+            url.searchParams.set('income', income);
+            url.searchParams.set('assets', assets);
+            url.searchParams.set('siblings', siblings);
+            
+            prompt('Copy this link to share your results:', url.toString());
+        }
+
+        // Pre-populate fields from query parameters if present
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const cost = urlParams.get('cost');
+            const income = urlParams.get('income');
+            const assets = urlParams.get('assets');
+            const siblings = urlParams.get('siblings');
+            
+            if (cost) costOfAttendanceCleave.setRawValue(cost);
+            if (income) {
+                incomeCleave.setRawValue(income);
+                document.getElementById('incomeSlider').value = Math.round(parseFloat(income) / 10000) * 10000;
+            }
+            if (assets) {
+                assetsCleave.setRawValue(assets);
+                document.getElementById('assetsSlider').value = Math.round(parseFloat(assets) / 10000) * 10000;
+            }
+            if (siblings) document.getElementById('siblings').value = siblings;
+        };
     </script>
 </body>
 </html>
