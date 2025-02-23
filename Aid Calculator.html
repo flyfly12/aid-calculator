@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Princeton Financial Aid Calculator</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        label { display: inline-block; width: 300px; }
+        input { padding: 5px; width: 150px; }
+        button { padding: 10px 20px; margin-top: 10px; }
+        h1, h2 { color: #333; }
+        p { margin: 5px 0; }
+    </style>
+</head>
+<body>
+    <h1>Princeton Financial Aid Calculator</h1>
+    <form id="aidForm">
+        <label for="income">Family Income ($):</label>
+        <input type="number" id="income" name="income" min="0" required><br><br>
+        
+        <label for="assets">Family Assets ($):</label>
+        <input type="number" id="assets" name="assets" min="0" required><br><br>
+        
+        <label for="siblings">Number of Undergraduate Siblings in College (including the student):</label>
+        <input type="number" id="siblings" name="siblings" min="1" required><br><br>
+        
+        <button type="button" onclick="calculateAid()">Calculate</button>
+    </form>
+    
+    <h2>Results</h2>
+    <p id="totalContribution"></p>
+    <p id="perChildContribution"></p>
+    <p id="financialNeed"></p>
+    <p id="eligibility"></p>
+    
+    <script>
+        function calculateAid() {
+            // Get input values
+            const income = parseFloat(document.getElementById('income').value);
+            const assets = parseFloat(document.getElementById('assets').value);
+            const siblings = parseInt(document.getElementById('siblings').value);
+            
+            // Calculate contributions
+            const incomeContribution = Math.max(0, 0.25 * (income - 100000));
+            const assetContribution = Math.max(0, 0.05 * (assets - 150000));
+            const totalFamilyContribution = incomeContribution + assetContribution;
+            const perChildContribution = totalFamilyContribution / siblings;
+            const costOfAttendance = 86700;
+            const financialNeed = costOfAttendance - perChildContribution;
+            
+            // Display results
+            document.getElementById('totalContribution').innerText = 
+                `Total Family Contribution: $${totalFamilyContribution.toFixed(2)}`;
+            document.getElementById('perChildContribution').innerText = 
+                `Per-Child Contribution: $${perChildContribution.toFixed(2)}`;
+            document.getElementById('financialNeed').innerText = 
+                `Financial Need: $${financialNeed.toFixed(2)}`;
+            
+            if (financialNeed > 0) {
+                document.getElementById('eligibility').innerText = 
+                    `Eligible for Aid: Yes, approximately $${financialNeed.toFixed(2)}`;
+            } else {
+                document.getElementById('eligibility').innerText = 
+                    'Eligible for Aid: No';
+            }
+        }
+    </script>
+</body>
+</html>
